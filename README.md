@@ -89,3 +89,7 @@ and you finally run your locust tests the usual way:
 ```
 locust -f task.py Task
 ```
+
+Navigate to http://0.0.0.0:8089/ after running locust.
+
+![image](https://user-images.githubusercontent.com/69576212/179865181-50f18335-2e51-4dd5-9b22-c468bc76e4e3.png)
