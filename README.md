@@ -10,62 +10,40 @@ An Odoo load testing solution, using openerplib and Locust
 
 # HowTo
 
-To load test Odoo, you create tasks sets like you'll have done it with Locust:
+To load test Odoo, you create tasks like you'll have done it with Locust:
 
 ```
-from locust import task, TaskSet
+from configparser import ConfigParser
 
-class SellerTaskSet(TaskSet):
-    @task(10)
-    def read_partners(self):
-        cust_model = self.client.get_model('res.partner')
-        cust_ids = cust_model.search([])
-        prtns = cust_model.read(cust_ids)
-        
-    @task(5)
-    def read_products(self):
-        prod_model = self.client.get_model('product.product')
-        ids = prod_model.search([])
-        prods = prod_model.read(ids)
-        
-    @task(20)
-    def create_so(self):
-        prod_model = self.client.get_model('product.product')
-        cust_model = self.client.get_model('res.partner')
-        so_model = self.client.get_model('sale.order')
-        
-        cust_id = cust_model.search([('name', 'ilike', 'fletch')])[0]
-        prod_ids = prod_model.search([('name', 'ilike', 'ipad')])
-        
-        order_id = so_model.create({
-            'partner_id': cust_id,
-            'order_line': [(0,0,{'product_id': prod_ids[0], 
-                                 'product_uom_qty':1}),
-                           (0,0,{'product_id': prod_ids[1], 
-                                 'product_uom_qty':2}),
-                          ],
-            
-        })
-        so_model.action_button_confirm([order_id,])
+from locust import task
+
+from src.odoo_locust import OdooLocust
+
+parser = ConfigParser()
+parser.read("odoo_locust.conf")
+
+
+class Task(OdooLocust):
+    host = parser.get("odoo_locust_config", "host")
+    database = parser.get("odoo_locust_config", "database")
+    min_wait = parser.getint("odoo_locust_config", "min_wait")
+    max_wait = parser.getint("odoo_locust_config", "max_wait")
+    weight = parser.getint("odoo_locust_config", "weight")
+
+    @task
+    def read_partner(self):
+        partner_model = self.client.get_model("res.partner")
+        partner_ids = partner_model.search([("personal_code", "=", "750000351")])
+        partners = partner_model.read(partner_ids)
+
+    @task
+    def read_contract(self):
+        sale_sub_model = self.client.get_model("sale.subscription")
+        subs_ids = sale_sub_model.search([("code", "=", "SUB4254")])
+        subs = sale_sub_model.read(subs_ids)
 ```
 
-then you create a profile, based on your taskset, which use OdooLocust instead of Locust:
-
-```
-from OdooLocust import OdooLocust
-from SellerTaskSet import SellerTaskSet
-
-class Seller(OdooLocust):
-    host = "127.0.0.1"
-    database = "test_db"
-    min_wait = 100
-    max_wait = 1000
-    weight = 3
-    
-    task_set = SellerTaskSet
-```
-
-create config file (odoo_locust.conf) which values will be used in python code
+then you create a profile config file (odoo_locust.conf)
 ```
 [odoo_locust_config]
 port = 80
