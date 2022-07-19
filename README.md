@@ -4,7 +4,7 @@ An Odoo load testing solution, using openerplib and Locust
 
 ## Links
 
-* openerplib: <a href="https://github.com/nicolas-van/openerp-client-lib">openerp-client-lib</a>
+* odoolib: <a href="https://github.com/odoo/odoo-client-lib">odoo-client-lib</a>
 * Locust: <a href="http://locust.io">locust.io</a>
 * Odoo: <a href="https://odoo.com">odoo.com</a>
 
