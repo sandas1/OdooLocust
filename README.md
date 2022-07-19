@@ -65,8 +65,27 @@ class Seller(OdooLocust):
     task_set = SellerTaskSet
 ```
 
+create config file (odoo_locust.conf) which values will be used in python code
+```
+[odoo_locust_config]
+port = 80
+login = admin
+password = secretpassword
+protocol = jsonrpc
+user_id = 2
+
+host = 127.0.0.1
+database = test_db
+min_wait = 100
+max_wait = 1000
+weight = 3
+
+use_https = False
+
+```
+
 and you finally run your locust tests the usual way:
 
 ```
-locust -f my_file.py Seller
+locust -f task.py Task
 ```
